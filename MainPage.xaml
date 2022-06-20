@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Census.ViewModels"
+             x:Class="Census.MainPage">
+
+  <Grid
+    RowDefinitions="*, 65, 100"
+    RowSpacing="10">
+
+    <Frame Grid.Row="0"
+           CornerRadius="10"
+           BorderColor="White"
+           BackgroundColor="Black"
+           Margin="0,0,0,0">
+
+      <CollectionView ItemsSource="{Binding FriendsOC}"
+                      SelectionMode="Single"
+                      SelectedItem="{Binding SelectedItem}"
+                      SelectionChangedCommand="{Binding SelectionChangedCommand}"
+                      SelectionChangedCommandParameter="{Binding .}" >
+
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*, 200">
+              <Label Grid.Column="0"
+                     Text="{Binding FName}"
+                     FontSize="20"
+                     TextColor="Yellow" />
+              <Label Grid.Column="1"
+                     Text="{Binding LName}"
+                     FontSize="20"
+                     TextColor="Yellow" />
+            </Grid>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+      </CollectionView>
+
+    </Frame>
+
+    <Frame Grid.Row="1"
+           CornerRadius="10"
+           BorderColor="White"
+           BackgroundColor="Black"
+           HeightRequest="60"
+           Margin="0,0,0,0"
+           Padding="0,2,0,0">
+
+      <Grid ColumnDefinitions="*, *, *">
+        <ImageButton Grid.Column="0" 
+                     Source="nullx.svg"
+                     BorderColor="Yellow"
+                     BorderWidth="2"
+                     WidthRequest="45"
+                     HeightRequest="45"
+                     Command="{Binding RevealCommand}"/>
+        <ImageButton Grid.Column="1" 
+                     Source="nullx.svg"
+                     BorderColor="Green"
+                     BorderWidth="2"
+                     WidthRequest="45"
+                     HeightRequest="45"
+                     IsVisible="{Binding ImportVisible}"
+                     Command="{Binding ImportFriendsCommand}"/>
+        <ImageButton Grid.Column="2" 
+                     Source="nullx.svg"
+                     BorderColor="Red"
+                     BorderWidth="2"
+                     WidthRequest="45"
+                     HeightRequest="45"
+                     IsVisible="{Binding DestroyVisible}"
+                     Command="{Binding DestroyCommand}"/>
+      </Grid>
+    </Frame>
+
+    <Button Grid.Row="2"
+            Text="Add"
+            Command="{Binding AddFriendCommand}" 
+            WidthRequest="100"
+            Margin="25,25,25,25"/>
+  </Grid>
+</ContentPage>
+

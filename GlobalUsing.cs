@@ -1,0 +1,9 @@
+﻿global using SQLite;
+global using CommunityToolkit.Mvvm.ComponentModel;
+global using Census.Classes;
+global using Census.Database;
+global using Census.ViewModels;
+global using System.Windows.Input;
+global using System.Text.Json;
+global using System.IO;
+global using System.Collections.ObjectModel;
