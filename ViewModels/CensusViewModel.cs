@@ -81,6 +81,23 @@ public partial class CensusViewModel : ObservableObject
 
   });
 
+  //sort and filter list
+  public ICommand SortLNameCommand => new Command(() =>
+  {
+    Console.WriteLine("Sort FName");
+  });
+
+  public ICommand SortFNameCommand => new Command(() =>
+  {
+    Console.WriteLine("Sort LName");
+  });
+
+  public ICommand FilterGroupCommand => new Command(() =>
+  {
+    Console.WriteLine("Filter Group");
+  });
+
+
   //Import Friends and Groups from json files
   public ICommand ImportFriendsCommand => new Command(async () =>
   {

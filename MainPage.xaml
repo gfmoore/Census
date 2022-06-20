@@ -5,10 +5,42 @@
              x:Class="Census.MainPage">
 
   <Grid
-    RowDefinitions="*, 65, 100"
+    RowDefinitions="65, *, 65, 70"
+    Margin="0,10,0,0"
     RowSpacing="10">
 
     <Frame Grid.Row="0"
+           CornerRadius="10"
+           BorderColor="Blue"
+           BackgroundColor="Black"
+           Margin="0,0,0,0">
+      <Grid ColumnDefinitions="*,*,20">
+        <Button Grid.Column="0"
+          Text="+"
+          BackgroundColor="#242124"
+          WidthRequest="50"
+          HorizontalOptions="Start"
+          Command="{Binding SortFNameCommand}"/>
+
+        <Button Grid.Column="1"
+          Text="+"
+          BackgroundColor="#242124"
+          WidthRequest="50"
+                          HorizontalOptions="Start"
+          Command="{Binding SortLNameCommand}"/>
+
+        <Button Grid.Column="2"
+          Text="+"
+          BackgroundColor="#242124"
+          WidthRequest="50"
+          Command="{Binding FilterGroupCommand}"/>
+
+
+
+      </Grid>
+    </Frame>
+
+    <Frame Grid.Row="1"
            CornerRadius="10"
            BorderColor="White"
            BackgroundColor="Black"
@@ -22,7 +54,7 @@
 
         <CollectionView.ItemTemplate>
           <DataTemplate>
-            <Grid ColumnDefinitions="*, 200">
+            <Grid ColumnDefinitions="*, *, 20">
               <Label Grid.Column="0"
                      Text="{Binding FName}"
                      FontSize="20"
@@ -31,6 +63,10 @@
                      Text="{Binding LName}"
                      FontSize="20"
                      TextColor="Yellow" />
+              <Label Grid.Column="2"
+                     Text="{Binding GroupId}"
+                     FontSize="20"
+                     TextColor="Green" />
             </Grid>
           </DataTemplate>
         </CollectionView.ItemTemplate>
@@ -38,7 +74,7 @@
 
     </Frame>
 
-    <Frame Grid.Row="1"
+    <Frame Grid.Row="2"
            CornerRadius="10"
            BorderColor="White"
            BackgroundColor="Black"
@@ -73,11 +109,12 @@
       </Grid>
     </Frame>
 
-    <Button Grid.Row="2"
+    <Button Grid.Row="3"
             Text="Add"
             Command="{Binding AddFriendCommand}" 
             WidthRequest="100"
-            Margin="25,25,25,25"/>
+            HeightRequest="50"
+            Margin="25,10,25,10"/>
   </Grid>
 </ContentPage>
 
