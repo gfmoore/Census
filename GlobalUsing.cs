@@ -7,3 +7,5 @@ global using System.Windows.Input;
 global using System.Text.Json;
 global using System.IO;
 global using System.Collections.ObjectModel;
+global using System.Linq;
+global using System.Collections.Generic;

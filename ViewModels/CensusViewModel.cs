@@ -11,33 +11,35 @@ public partial class CensusViewModel : ObservableObject
   [ObservableProperty]
   public ObservableCollection<Friend> friendsOC = new();
 
+  //[ObservableProperty]
+  //public ObservableCollection<FSGroup> groupsOC = new();
+
   public CensusViewModel()
   {
-    //ImportVisible = false;
-    //DestroyVisible = false;
-    Console.WriteLine("heyupski G");
-    //Friend g = new Friend();
-    //g.FName = "G";
-    //g.LName = "M";
-    //FriendsOC.Add(g);
+    Console.WriteLine("At CensusViewModel constructor");
     LoadData();
   }
 
   public async void LoadData()
   {
-
+    FriendsOC.Clear();
     List<Friend> l = await App.Database.GetFriendsAsync();
     Console.WriteLine("hi");
     foreach (Friend f in l)
     {
       FriendsOC.Add(f);
     }
+
+    //can this be done?? https://stackoverflow.com/questions/71471249/c-sharp-sort-an-observablecollection
+    //List<Friends> list = FriendsOC.ToList()
+    //list.sort(l, r) => l.Id.CompareTo(r.Id)); sort by list.id
+    //FriendsOC = new ObservableCollection<Friends>(list)
   }
 
   public ICommand AddFriendCommand => new Command(() =>
   {
     Console.WriteLine("Add Friend");
-    Friend g = new Friend();
+    Friend g = new();
     g.FName = "A";
     g.LName = "T";
     FriendsOC.Add(g);
@@ -71,11 +73,7 @@ public partial class CensusViewModel : ObservableObject
       await App.Database.DeleteAllFriendsAsync();
       await App.Database.DeleteAllGroupsAsync();
       Console.WriteLine($"DESTROYED!!");
-      //refresh
 
-      //TODO need to be able to refresh via binding?
-      //FriendsList.ItemsSource = await App.Database.GetFriendsAsync();
-      //reset
       pushCount = 0;
     }
 
@@ -84,12 +82,18 @@ public partial class CensusViewModel : ObservableObject
   //sort and filter list
   public ICommand SortLNameCommand => new Command(() =>
   {
-    Console.WriteLine("Sort FName");
+    Console.WriteLine("Sort LName");
+    //List<Friend> l = FriendsOC.ToList();
+    //List<Friend> s = l.OrderBy(x => x.LName).ToList();
+    //FriendsOC = new ObservableCollection<Friend>(s);
+    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
   });
 
   public ICommand SortFNameCommand => new Command(() =>
   {
-    Console.WriteLine("Sort LName");
+    Console.WriteLine("Sort FName");
+
+    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
   });
 
   public ICommand FilterGroupCommand => new Command(() =>
