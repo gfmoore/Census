@@ -1,4 +1,6 @@
-﻿namespace Census.ViewModels;
+﻿using Census.Classes;
+
+namespace Census.ViewModels;
 
 public partial class CensusViewModel : ObservableObject
 {
@@ -11,8 +13,11 @@ public partial class CensusViewModel : ObservableObject
   [ObservableProperty]
   public ObservableCollection<Friend> friendsOC = new();
 
-  //[ObservableProperty]
-  //public ObservableCollection<FSGroup> groupsOC = new();
+  [ObservableProperty]
+  List<string> fSGroups = new() { "All", "1", "2", "3", "4", "5", "6", "" };
+
+  [ObservableProperty]
+  private int productGroupsIndex = -1;
 
   public CensusViewModel()
   {
@@ -22,26 +27,19 @@ public partial class CensusViewModel : ObservableObject
 
   public async void LoadData()
   {
-    FriendsOC.Clear();
+    //FriendsOC.Clear();
     List<Friend> l = await App.Database.GetFriendsAsync();
-    Console.WriteLine("hi");
-    foreach (Friend f in l)
-    {
-      FriendsOC.Add(f);
-    }
-
-    //can this be done?? https://stackoverflow.com/questions/71471249/c-sharp-sort-an-observablecollection
-    //List<Friends> list = FriendsOC.ToList()
-    //list.sort(l, r) => l.Id.CompareTo(r.Id)); sort by list.id
-    //FriendsOC = new ObservableCollection<Friends>(list)
+    FriendsOC = new ObservableCollection<Friend>(l);
   }
 
   public ICommand AddFriendCommand => new Command(() =>
   {
     Console.WriteLine("Add Friend");
-    Friend g = new();
-    g.FName = "A";
-    g.LName = "T";
+    Friend g = new()
+    {
+      FName = "A",
+      LName = "T"
+    };
     FriendsOC.Add(g);
   });
 
@@ -83,27 +81,37 @@ public partial class CensusViewModel : ObservableObject
   public ICommand SortLNameCommand => new Command(() =>
   {
     Console.WriteLine("Sort LName");
-    //List<Friend> l = FriendsOC.ToList();
-    //List<Friend> s = l.OrderBy(x => x.LName).ToList();
-    //FriendsOC = new ObservableCollection<Friend>(s);
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
   });
 
   public ICommand SortFNameCommand => new Command(() =>
   {
     Console.WriteLine("Sort FName");
-
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
   });
 
-  public ICommand FilterGroupCommand => new Command(() =>
+  [ObservableProperty]
+  int indexChanged = 0;
+
+  partial void OnProductGroupsIndexChanged(int value)
   {
-    Console.WriteLine("Filter Group");
-  });
+    filterData(value);  //to use async await
+  }
+
+  private async void filterData(int value)
+  {
+    //get original data from sqlite
+    List<Friend> l = await App.Database.GetFriendsAsync();
+    FriendsOC = new ObservableCollection<Friend>(l);
+    if (value != 0)  //0 = All
+    {
+      FriendsOC = new ObservableCollection<Friend>(FriendsOC.Where(x => x.GroupId == value.ToString()));
+    }
+  }
 
 
   //Import Friends and Groups from json files
-  public ICommand ImportFriendsCommand => new Command(async () =>
+  public static ICommand ImportFriendsCommand => new Command(async () =>
   {
     //create custom filetypes
     var customFileType = new FilePickerFileType(

@@ -26,17 +26,16 @@
           Text="+"
           BackgroundColor="#242124"
           WidthRequest="50"
-                          HorizontalOptions="Start"
+          HorizontalOptions="Start"
           Command="{Binding SortLNameCommand}"/>
 
-        <Button Grid.Column="2"
-          Text="+"
-          BackgroundColor="#242124"
-          WidthRequest="50"
-          Command="{Binding FilterGroupCommand}"/>
-
-
-
+        <Picker Grid.Column="2"
+                Title="Grp"
+                BackgroundColor="#242124"
+                WidthRequest="50"
+                HeightRequest="50"
+                ItemsSource="{Binding FSGroups}"
+                SelectedIndex="{Binding ProductGroupsIndex}" />
       </Grid>
     </Frame>
 
