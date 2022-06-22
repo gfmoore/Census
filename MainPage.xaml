@@ -35,7 +35,7 @@
                 WidthRequest="50"
                 HeightRequest="50"
                 ItemsSource="{Binding FSGroups}"
-                SelectedIndex="{Binding ProductGroupsIndex}" />
+                SelectedIndex="{Binding FSGroupsIndex}" />
       </Grid>
     </Frame>
 
@@ -96,7 +96,7 @@
                      WidthRequest="45"
                      HeightRequest="45"
                      IsVisible="{Binding ImportVisible}"
-                     Command="{Binding ImportFriendsCommand}"/>
+                     Command="{Binding ImportDataCommand}"/>
         <ImageButton Grid.Column="2" 
                      Source="nullx.svg"
                      BorderColor="Red"

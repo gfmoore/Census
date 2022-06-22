@@ -4,6 +4,9 @@ namespace Census.ViewModels;
 
 public partial class CensusViewModel : ObservableObject
 {
+  //selected item in the list of friends
+  public Friend SelectedItem { get; set; }
+
   [ObservableProperty]
   public bool importVisible = true;
 
@@ -13,11 +16,22 @@ public partial class CensusViewModel : ObservableObject
   [ObservableProperty]
   public ObservableCollection<Friend> friendsOC = new();
 
+  //Picker for groups
   [ObservableProperty]
   List<string> fSGroups = new() { "All", "1", "2", "3", "4", "5", "6", "" };
 
   [ObservableProperty]
-  private int productGroupsIndex = -1;
+  private int fSGroupsIndex = -1;
+
+  //[ObservableProperty]
+  //int indexChanged = 0;
+
+  partial void OnFSGroupsIndexChanged(int value)
+  {
+    FilterData(value);  //to use async await
+  }
+
+
 
   public CensusViewModel()
   {
@@ -27,7 +41,6 @@ public partial class CensusViewModel : ObservableObject
 
   public async void LoadData()
   {
-    //FriendsOC.Clear();
     List<Friend> l = await App.Database.GetFriendsAsync();
     FriendsOC = new ObservableCollection<Friend>(l);
   }
@@ -43,9 +56,8 @@ public partial class CensusViewModel : ObservableObject
     FriendsOC.Add(g);
   });
 
-  public Friend SelectedItem { get; set; }
 
-  //respond to item select
+  //respond to item select in list of friends
   public ICommand SelectionChangedCommand => new Command<Object>((Object e) =>
   {
     Console.WriteLine($"selection made {SelectedItem.FName} {SelectedItem.LName}");
@@ -60,22 +72,6 @@ public partial class CensusViewModel : ObservableObject
     DestroyVisible = !DestroyVisible;
   });
 
-  //Destroy
-  int pushCount = 0;
-  public ICommand DestroyCommand => new Command(async () =>
-  {
-    pushCount++;
-    if (pushCount == 3)
-    {
-      Console.WriteLine($"DESTROY...");
-      await App.Database.DeleteAllFriendsAsync();
-      await App.Database.DeleteAllGroupsAsync();
-      Console.WriteLine($"DESTROYED!!");
-
-      pushCount = 0;
-    }
-
-  });
 
   //sort and filter list
   public ICommand SortLNameCommand => new Command(() =>
@@ -90,15 +86,7 @@ public partial class CensusViewModel : ObservableObject
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
   });
 
-  [ObservableProperty]
-  int indexChanged = 0;
-
-  partial void OnProductGroupsIndexChanged(int value)
-  {
-    filterData(value);  //to use async await
-  }
-
-  private async void filterData(int value)
+  private async void FilterData(int value)
   {
     //get original data from sqlite
     List<Friend> l = await App.Database.GetFriendsAsync();
@@ -110,9 +98,10 @@ public partial class CensusViewModel : ObservableObject
   }
 
 
-  //Import Friends and Groups from json files
-  public static ICommand ImportFriendsCommand => new Command(async () =>
+  //Import Friends and Groups from json files put in Downloads folder for device
+  public ICommand ImportDataCommand => new Command( async () =>
   {
+    Console.WriteLine("Import data");
     //create custom filetypes
     var customFileType = new FilePickerFileType(
       new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -130,24 +119,23 @@ public partial class CensusViewModel : ObservableObject
     Console.WriteLine($"Import friends");
     options.PickerTitle = "Please select friends.json file";
 
-    await PickFriends(options);
+    await GrabFriends(options);
     Console.WriteLine("Friends imported.");
 
 
     Console.WriteLine($"Import groups");
     options.PickerTitle = "Please select groups.json file";
 
-    await PickGroups(options);
+    await GrabGroups(options);
     Console.WriteLine("Groups imported");
 
-
     //refresh
-    //FriendsList.ItemsSource = await App.Database.GetFriendsAsync();
+    List<Friend> l = await App.Database.GetFriendsAsync();
+    FriendsOC = new ObservableCollection<Friend>(l);
+    
   });
 
-
-
-  public static async Task<FileResult> PickFriends(PickOptions options)
+  public static async Task<FileResult> GrabFriends(PickOptions options)
   {
     await App.Database.DeleteAllFriendsAsync();
     try
@@ -179,7 +167,7 @@ public partial class CensusViewModel : ObservableObject
     return null;
   }
 
-  public static async Task<FileResult> PickGroups(PickOptions options)
+  public static async Task<FileResult> GrabGroups(PickOptions options)
   {
     await App.Database.DeleteAllGroupsAsync();
 
@@ -209,6 +197,29 @@ public partial class CensusViewModel : ObservableObject
 
     return null;
   }
+
+  //Destroy
+  int pushCount = 0;  
+  public ICommand DestroyCommand => new Command(async () =>
+  {
+    pushCount++;
+    if (pushCount == 1)
+    {
+      //start a timer and then reset to 0
+    }
+    if (pushCount == 3)
+    {
+      Console.WriteLine($"DESTROY...");
+      await App.Database.DeleteAllFriendsAsync();
+      await App.Database.DeleteAllGroupsAsync();
+      Console.WriteLine($"DESTROYED!!");
+
+      pushCount = 0;
+    }
+    //refresh
+    List<Friend> l = await App.Database.GetFriendsAsync();
+    FriendsOC = new ObservableCollection<Friend>(l);
+  });
 
 }
 
