@@ -5,27 +5,30 @@
              x:Class="Census.MainPage">
 
   <Grid
-    RowDefinitions="65, *, 65, 70"
+    RowDefinitions="30, *, 65, 10"
     Margin="0,10,0,0"
     RowSpacing="10">
 
     <Frame Grid.Row="0"
            CornerRadius="10"
-           BorderColor="Blue"
+           BorderColor="DarkBlue"
            BackgroundColor="Black"
-           Margin="0,0,0,0">
-      <Grid ColumnDefinitions="*,*,20">
+           Margin="0,0,0,0"
+           Padding="0,5,0,0">
+      <Grid ColumnDefinitions="150,150,*">
         <Button Grid.Column="0"
           Text="+"
-          BackgroundColor="#242124"
+          BackgroundColor="#2f4f4f"
           WidthRequest="50"
+          HeightRequest="30"
           HorizontalOptions="Start"
           Command="{Binding SortFNameCommand}"/>
 
         <Button Grid.Column="1"
           Text="+"
-          BackgroundColor="#242124"
+          BackgroundColor="#2f4f4f"
           WidthRequest="50"
+          HeightRequest="20"
           HorizontalOptions="Start"
           Command="{Binding SortLNameCommand}"/>
 
@@ -81,15 +84,52 @@
            Margin="0,0,0,0"
            Padding="0,2,0,0">
 
-      <Grid ColumnDefinitions="*, *, *">
+      <Grid ColumnDefinitions="60, 100, *, *, *">
         <ImageButton Grid.Column="0" 
-                     Source="nullx.svg"
+                     Source="people.svg"
                      BorderColor="Yellow"
                      BorderWidth="2"
                      WidthRequest="45"
                      HeightRequest="45"
-                     Command="{Binding RevealCommand}"/>
-        <ImageButton Grid.Column="1" 
+                     Command="{Binding RevealCommand}">
+          <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="CommonStates">
+              <VisualState x:Name="Normal">
+                <VisualState.Setters>
+                  <Setter Property="Scale" 
+                          Value="1" />
+                </VisualState.Setters>
+              </VisualState>
+              <VisualState x:Name="Pressed">
+                <VisualState.Setters>
+                  <Setter Property="Scale" 
+                          Value="0.8" />
+                </VisualState.Setters>
+              </VisualState>
+            </VisualStateGroup>
+          </VisualStateManager.VisualStateGroups>
+        </ImageButton>
+
+        <Entry Grid.Column="1" 
+               FontSize="20"
+               Text="{Binding Passphrase}"
+               IsEnabled="{Binding PassphraseEntryEnabled}"
+               IsPassword="True"
+               WidthRequest="95"
+               HeightRequest="40"
+               Background="#2f4f4f"
+               ReturnCommand="{Binding DecryptCommand}"
+          />
+        <ImageButton Grid.Column="2" 
+                     Source="nullx.svg"
+                     BorderColor="yellow"
+                     BorderWidth="2"
+                     WidthRequest="45"
+                     HeightRequest="45"
+                     IsVisible="{Binding ChangePassphraseVisible}"
+                     Command="{Binding ChangePassphraseCommand}"/>
+
+        <ImageButton Grid.Column="3" 
                      Source="nullx.svg"
                      BorderColor="Green"
                      BorderWidth="2"
@@ -97,23 +137,25 @@
                      HeightRequest="45"
                      IsVisible="{Binding ImportVisible}"
                      Command="{Binding ImportDataCommand}"/>
-        <ImageButton Grid.Column="2" 
+
+        <ImageButton Grid.Column="4" 
                      Source="nullx.svg"
                      BorderColor="Red"
                      BorderWidth="2"
                      WidthRequest="45"
                      HeightRequest="45"
+                     
                      IsVisible="{Binding DestroyVisible}"
                      Command="{Binding DestroyCommand}"/>
       </Grid>
     </Frame>
 
-    <Button Grid.Row="3"
+    <!--<Button Grid.Row="3"
             Text="Add"
             Command="{Binding AddFriendCommand}" 
             WidthRequest="100"
             HeightRequest="50"
-            Margin="25,10,25,10"/>
+            Margin="25,10,25,10"/>-->
   </Grid>
 </ContentPage>
 

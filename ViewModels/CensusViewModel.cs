@@ -1,5 +1,4 @@
 ﻿using Census.Classes;
-
 namespace Census.ViewModels;
 
 public partial class CensusViewModel : ObservableObject
@@ -8,13 +7,18 @@ public partial class CensusViewModel : ObservableObject
   public Friend SelectedItem { get; set; }
 
   [ObservableProperty]
-  public bool importVisible = true;
+  private bool importVisible = true;
 
   [ObservableProperty]
-  public bool destroyVisible = true;
+  private bool destroyVisible = true;
 
   [ObservableProperty]
-  public ObservableCollection<Friend> friendsOC = new();
+  private bool changePassphrase = true;
+
+  public bool CanChangePassphrase = true;
+
+  [ObservableProperty]
+  private ObservableCollection<Friend> friendsOC = new();
 
   //Picker for groups
   [ObservableProperty]
@@ -22,6 +26,12 @@ public partial class CensusViewModel : ObservableObject
 
   [ObservableProperty]
   private int fSGroupsIndex = -1;
+
+  [ObservableProperty]
+  private string passphrase;
+
+  [ObservableProperty]
+  private bool passphraseEntryEnabled = true; //connected the the passphrase entry control (view
 
   //[ObservableProperty]
   //int indexChanged = 0;
@@ -37,6 +47,7 @@ public partial class CensusViewModel : ObservableObject
   {
     Console.WriteLine("At CensusViewModel constructor");
     LoadData();
+    SetupTimer();
   }
 
   public async void LoadData()
@@ -48,12 +59,23 @@ public partial class CensusViewModel : ObservableObject
   public ICommand AddFriendCommand => new Command(() =>
   {
     Console.WriteLine("Add Friend");
-    Friend g = new()
-    {
-      FName = "A",
-      LName = "T"
-    };
-    FriendsOC.Add(g);
+    //Friend g = new()
+    //{
+    //  FName = "A",
+    //  LName = "T"
+    //};
+    //FriendsOC.Add(g);
+    string passphrase = "1234";
+    string clearText = "Hello Gordon";
+    string cipherText = "";
+
+
+    //cipher = EncryptionHelper.Encrypt(clear, encryptionkey);
+    cipherText = EncryptionHelper.Encrypt(clearText, passphrase);
+    Console.WriteLine(cipherText);
+    //decrypt = EncryptionHelper.Decrypt(cipher, encryptionkey);
+    clearText = EncryptionHelper.Decrypt(cipherText, passphrase);
+    Console.WriteLine(clearText);
   });
 
 
@@ -199,13 +221,20 @@ public partial class CensusViewModel : ObservableObject
   }
 
   //Destroy
-  int pushCount = 0;  
+  public static int pushCount = 0;
+  private static System.Timers.Timer timer = new(3000);
+  public void SetupTimer()  //called from constructir
+  {
+    timer.Elapsed += OnTimedEvent;
+    timer.AutoReset = false;
+  }
   public ICommand DestroyCommand => new Command(async () =>
   {
     pushCount++;
     if (pushCount == 1)
     {
-      //start a timer and then reset to 0
+      Console.WriteLine("Timer started");
+      timer.Start();
     }
     if (pushCount == 3)
     {
@@ -220,6 +249,78 @@ public partial class CensusViewModel : ObservableObject
     List<Friend> l = await App.Database.GetFriendsAsync();
     FriendsOC = new ObservableCollection<Friend>(l);
   });
+
+  private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+  {
+    // Code to be executed at the end of Timer 
+    Console.WriteLine("Timer ending 3 second count");
+    timer.Stop();
+    timer.Close();
+    pushCount = 0;
+  }
+
+  public ICommand ChangePassphraseCommand => new Command(() =>
+  {
+    EncryptData();
+    Console.WriteLine("Change Passphrase");
+  });
+
+  public ICommand DecryptCommand => new Command( () =>
+  {
+    Console.WriteLine("Decrypt the display " + Passphrase);
+
+    DecryptData();
+
+  });
+
+  public async void EncryptData()
+  {
+    //do the displayed data first
+    Console.WriteLine("Encrypting data");
+    foreach (Friend f in FriendsOC)
+    {
+      f.FName = EncryptionHelper.Encrypt(f.FName, Passphrase);
+      f.LName = EncryptionHelper.Encrypt(f.LName, Passphrase);
+      f.GroupId = EncryptionHelper.Encrypt(f.GroupId, Passphrase);
+      f.Mobile = EncryptionHelper.Encrypt(f.Mobile, Passphrase);
+      f.Landline = EncryptionHelper.Encrypt(f.Landline, Passphrase);
+      f.Email = EncryptionHelper.Encrypt(f.Email, Passphrase);
+      f.Address = EncryptionHelper.Encrypt(f.Address, Passphrase);
+    }
+    //Writing encrypted data to sqlite db
+    await App.Database.DeleteAllFriendsAsync();
+    foreach(Friend f in FriendsOC)
+    {
+      await App.Database.SaveFriendAsync(f);
+    }
+    //refresh display
+
+    //dismiss the keyboard
+    Passphrase = "";
+    PassphraseEntryEnabled = false;
+    PassphraseEntryEnabled = true;
+    Console.WriteLine("Data encrypted");
+  }
+
+  public void DecryptData()
+  {
+    foreach (Friend f in FriendsOC)
+    {
+      f.FName = EncryptionHelper.Decrypt(f.FName, Passphrase);
+      f.LName = EncryptionHelper.Decrypt(f.LName, Passphrase);
+      f.GroupId = EncryptionHelper.Decrypt(f.GroupId, Passphrase);
+      f.Mobile = EncryptionHelper.Decrypt(f.Mobile, Passphrase);
+      f.Landline = EncryptionHelper.Decrypt(f.Landline, Passphrase);
+      f.Email = EncryptionHelper.Decrypt(f.Email, Passphrase);
+      f.Address = EncryptionHelper.Decrypt(f.Address, Passphrase);
+    }
+    //redisplay
+
+    //dismiss the keyboard
+    Passphrase = "";
+    PassphraseEntryEnabled = false;
+    PassphraseEntryEnabled = true;
+  }
 
 }
 
