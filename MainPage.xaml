@@ -37,14 +37,15 @@
           Command="{Binding SortLNameCommand}"/>
 
         <Picker Grid.Column="2"
-                Title="Grp"
+                Title="Group"
                 BackgroundColor="#2f4f4f"
                 WidthRequest="50"
                 HeightRequest="20"
                 HorizontalOptions="Start"
                 FontSize="15"
                 ItemsSource="{Binding FSGroups}"
-                SelectedIndex="{Binding FSGroupsIndex}" />
+                SelectedIndex="{Binding FSGroupsIndex}" 
+                SelectedItem="{Binding FSGroupsSelectedItem}" />
       </Grid>
     </Frame>
 

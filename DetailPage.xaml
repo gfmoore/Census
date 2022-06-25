@@ -5,47 +5,161 @@
 
              NavigationPage.HasNavigationBar="false">
 
-  <Grid RowDefinitions="*"
-    Margin="0,0,0,0"
-    RowSpacing="5">
-
-    <Frame Grid.Row="0"
-         CornerRadius="10"
-         BorderColor="Yellow"
+  <Frame CornerRadius="10"
+         BorderColor="White"
          BackgroundColor="Black"
-         Margin="10,10,10,10">
+         Margin="0,0,0,0"
+         Padding="10,10,10,10">
+    
+    <ScrollView>
+      <StackLayout>
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="First Name :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
 
-      <Grid RowDefinitions="*,*,*, *"
-            Margin="10,10,10,10"
-            RowSpacing="10">
-        <Grid Grid.Row="0" 
-              ColumnDefinitions="*, *">
-          <Label Grid.Column="0" 
-                 Text="{Binding FName}"
-                 TextColor="Yellow" 
-                 FontSize="20"/>
-               
-          <Label Grid.Column="1" 
-                 Text="{Binding LName}" 
-                 TextColor="Yellow" 
-                 FontSize="20"/>
-        </Grid>
-        
-        <Entry Grid.Row="1" 
-               FontSize="20"
-               TextColor="Yellow"
-               Placeholder="Hello for text" 
-               PlaceholderColor="White" />
-        
-        <Button Grid.Row="2" 
-                Text="Hit me" 
-                TextColor="Yellow" 
-                BackgroundColor="Blue" 
-                FontSize="30" 
-                Command="{Binding ReturnMainPageCommand}"/>
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.FName}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
         </Grid>
 
-    </Frame>
-  </Grid>
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="Last Name :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
 
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.LName}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
+        </Grid>
+      
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="Group Id :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
+
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.GroupId}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
+        </Grid>
+      
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="Mobile :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
+
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.Mobile}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
+        </Grid>
+      
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="Landline :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
+
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.Landline}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
+        </Grid>
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="Email :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
+
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.Email}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
+        </Grid>
+        <Grid ColumnDefinitions="120,*"
+              ColumnSpacing="5">
+          <Label Grid.Column="0"
+                 Text="Address :"
+                 FontSize="20"
+                 Margin="0,0,0,0"
+                 Padding="0,10,0,0"
+                 TextColor="LightBlue" />
+
+          <Entry Grid.Column="1" 
+                    Text="{Binding Friend.Address}"
+                    TextColor="Yellow" 
+                    FontSize="20"/>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*, *, *"
+              Margin="0,0,0,0"
+              Padding="0,20,0,0">
+          <Button Grid.Column="0" 
+                      Text="Change" 
+                      TextColor="White" 
+                      BackgroundColor="Green" 
+                      FontSize="20" 
+                      WidthRequest="80"
+                      HeightRequest="40"
+                      Padding="0,0,0,0"
+                      Command="{Binding UpdateReturnMainPageCommand}"/>
+
+          <Button Grid.Column="1" 
+                      Text="Add New" 
+                      TextColor="White" 
+                      BackgroundColor="Orange" 
+                      FontSize="20" 
+                      WidthRequest="80"
+                      HeightRequest="40"
+                      Padding="0,0,0,0"
+                      Command="{Binding AddReturnMainPageCommand}"/>
+
+          <Button Grid.Column="2" 
+                      Text="Delete" 
+                      TextColor="White" 
+                      BackgroundColor="Red" 
+                      FontSize="20" 
+                      WidthRequest="80"
+                      HeightRequest="40"
+                      Padding="0,0,0,0"
+                      Command="{Binding DeleteReturnMainPageCommand}"/>
+
+          <Button Grid.Column="3" 
+                      Text="Cancel" 
+                      TextColor="White" 
+                      BackgroundColor="Blue" 
+                      FontSize="20" 
+                      WidthRequest="80"
+                      HeightRequest="40"
+                      Padding="0,0,0,0"
+                      Command="{Binding CancelReturnMainPageCommand}"/>
+        </Grid>
+      </StackLayout>
+    </ScrollView>
+  </Frame>
 </ContentPage>

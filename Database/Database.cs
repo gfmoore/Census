@@ -19,6 +19,11 @@ public class Database
     return _database.Table<Friend>().ToListAsync();
   }
 
+  public Task<Friend> GetFriendAsync(int id)
+  {
+    return _database.GetAsync<Friend>(id);
+  }
+
   public Task<int> SaveFriendAsync(Friend friend)
   {
     return _database.InsertAsync(friend);

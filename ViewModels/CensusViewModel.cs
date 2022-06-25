@@ -4,8 +4,16 @@ namespace Census.ViewModels;
 
 public partial class CensusViewModel : ObservableObject
 {
+  public CensusViewModel()
+  {
+    LoadData();
+    SetupTimer();
+  }
+
+
   //selected item in the list of friends
-  public Friend SelectedItem { get; set; }
+  [ObservableProperty]
+  private Friend selectedItem;
 
   [ObservableProperty]
   private bool passwordVisible = true;
@@ -36,49 +44,45 @@ public partial class CensusViewModel : ObservableObject
   private int fSGroupsIndex = -1;
 
   [ObservableProperty]
+  private string fSGroupsSelectedItem = String.Empty;  //not used yet
+
+
+  [ObservableProperty]
   private string passphrase;
 
   [ObservableProperty]
   private bool passphraseEntryEnabled = true; //connected the the passphrase entry control (view
 
+
+
   partial void OnFSGroupsIndexChanged(int value)
   {
-    FilterData(value);  //to use async await
+    FilterData(value);  //to use async await  //using the index
+    //FilterData(FSGroupsSelectedItem);       //using the string, doesn't work
   }
 
-
-
-  public CensusViewModel()
-  {
-    Console.WriteLine("At CensusViewModel constructor");
-    LoadData();
-    SetupTimer();
-  }
 
   public async void LoadData()
   {
     List<Friend> l = await App.Database.GetFriendsAsync();
     FriendsOC = new ObservableCollection<Friend>(l);
+    //make a copy for filtering of unencrypted data
+    lf = l;
   }
 
   //respond to item select in list of friends
-
   public ICommand SelectionChangedCommand => new Command<Object>(async (Object e) =>
   {
     Console.WriteLine($"Selection made {SelectedItem.FName} {SelectedItem.LName}");
 
     INavigation navigation = App.Current.MainPage.Navigation;
-    await navigation.PushAsync(new DetailPage
-    {
-      BindingContext = SelectedItem
-    });
+    await navigation.PushModalAsync(new DetailPage(SelectedItem));
+
   });
 
-  //public ICommand ReturnMainPageCommand => new Command<Object>(async (Object e) =>
-  //{
-  //  INavigation navigation = App.Current.MainPage.Navigation;
-  //  await navigation.PopAsync();
-  //});
+
+
+
 
 
   //Reveal Actions - for decrypt encrypt import destroy buttons
@@ -111,13 +115,15 @@ public partial class CensusViewModel : ObservableObject
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
   });
 
-  private void FilterData(int value)
+  private void FilterData(int value)  //if using the index from the pick
+  //private void FilterData(string value) //using the string from the pick - doesnt work
   {
     //get original data from lf
     FriendsOC = new ObservableCollection<Friend>(lf);
-    if (value != 0)  //0 = All
+    //if (value != 0)  //0 = All
+    if (FSGroups[value] != "All")  
     {
-      FriendsOC = new ObservableCollection<Friend>(FriendsOC.Where(x => x.GroupId == value.ToString()));
+      FriendsOC = new ObservableCollection<Friend>(FriendsOC.Where(x => x.GroupId == FSGroups[value]));
     }
   }
 
@@ -175,7 +181,6 @@ public partial class CensusViewModel : ObservableObject
         {
           await App.Database.SaveFriendAsync(f);
         }
-
 
         Console.WriteLine("GM: JSON file data loaded");
 
