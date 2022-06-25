@@ -6,52 +6,14 @@ public partial class CensusDetailViewModel : ObservableObject
   [ObservableProperty]
   private Friend friend;  //passed through this constructor from the CollectionView.SelectedItem
 
-  //[ObservableProperty]
-  //private string fName;
-
-  //[ObservableProperty]
-  //private string lName;
-
-  //[ObservableProperty]
-  //private string groupId;
-
-  //[ObservableProperty]
-  //private string mobile;
-
-  //[ObservableProperty]
-  //private string landline;
- 
-  //[ObservableProperty]
-  //private string email;
- 
-  //[ObservableProperty]
-  //private string address;
- 
-
   public CensusDetailViewModel(Friend friend)
   {
-    //I've got access to the selected item now, it's long winded approach!!
-    //f = fr;
-    Friend = friend;
-    //fName     = friend.FName;
-    //lName     = friend.LName;
-    //groupId   = friend.GroupId;
-    //mobile    = friend.Mobile;
-    //landline  = friend.Landline;
-    //email     = friend.Email;
-    //address   = friend.Address;
+    Friend = friend;  //is this constructor and assignment necessary to link to the ObservableProperty?
   }
 
   public ICommand UpdateReturnMainPageCommand => new Command<Object>(async (Object e) =>
   {
-    //f.FName = FName;
-    //f.LName = LName;
-    //f.GroupId = GroupId;
-    //f.Mobile = Mobile;
-    //f.Landline = Landline;
-    //f.Email = Email;
-    //f.Address = Address;
-    //await App.Database.UpdateFriendAsync(f);
+    await App.Database.UpdateFriendAsync(Friend);
 
     INavigation navigation = App.Current.MainPage.Navigation;
     await navigation.PopModalAsync();
@@ -59,15 +21,8 @@ public partial class CensusDetailViewModel : ObservableObject
 
   public ICommand AddReturnMainPageCommand => new Command<Object>(async (Object e) =>
   {
-    //f.FName = FName;
-    //f.LName = LName;
-    //f.GroupId = GroupId;
-    //f.Mobile = Mobile;
-    //f.Landline = Landline;
-    //f.Email = Email;
-    //f.Address = Address;
-    //f.Id = 0;
-    //await App.Database.SaveFriendAsync(f);
+    Friend.Id = 0;  //will this be enough to add a new friend?
+    await App.Database.SaveFriendAsync(Friend);
 
     INavigation navigation = App.Current.MainPage.Navigation;
     await navigation.PopModalAsync();
@@ -75,7 +30,7 @@ public partial class CensusDetailViewModel : ObservableObject
 
   public ICommand DeleteReturnMainPageCommand => new Command<Object>(async (Object e) =>
   {
-    //await App.Database.DeleteFriendAsync(f);
+    await App.Database.DeleteFriendAsync(Friend);
 
     INavigation navigation = App.Current.MainPage.Navigation;
     await navigation.PopModalAsync();
