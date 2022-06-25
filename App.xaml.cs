@@ -4,7 +4,7 @@ public partial class App : Application
 {
   //setup database
   private static Database.Database database;
-  private static string filename = "database.db3";
+  private readonly static string filename = "database.db3";
   public static Database.Database Database
   {
     get
@@ -17,10 +17,11 @@ public partial class App : Application
     }
   }
 
-  public App()
+  public App(MainPage mainPage)
   {
     InitializeComponent();
+    Application.Current.UserAppTheme = AppTheme.Dark;
 
-    MainPage = new AppShell();
+    MainPage = new NavigationPage(mainPage);
   }
 }

@@ -1,55 +1,67 @@
-﻿//https://stackoverflow.com/questions/10168240/encrypting-decrypting-a-string-in-c-sharp
-
+﻿//https://www.c-sharpcorner.com/article/encryption-and-decryption-using-a-symmetric-key-in-c-sharp/
+//https://stackoverflow.com/questions/17195969/generating-aes-256-bit-key-value?answertab=trending#tab-top
 
 namespace Census.Classes;
 public static class EncryptionHelper
 {
-  public static string Encrypt(string clearText, string EncryptionKey)
+  public static string Encrypt(string plainText, byte[] encryptionKeyBytes)
   {
-    //string EncryptionKey = "abc123";
-    byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
-    using (Aes encryptor = Aes.Create())
+    byte[] iv = new byte[16];
+    byte[] array;
+
+    using (Aes aes = Aes.Create())
     {
-      Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-      encryptor.Key = pdb.GetBytes(32);
-      encryptor.IV = pdb.GetBytes(16);
-      using (MemoryStream ms = new MemoryStream())
+      aes.Key = encryptionKeyBytes;
+      aes.IV = iv;
+
+      ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+      using (MemoryStream memoryStream = new())
       {
-        using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+        using (CryptoStream cryptoStream = new((Stream)memoryStream, encryptor, CryptoStreamMode.Write))
         {
-          cs.Write(clearBytes, 0, clearBytes.Length);
-          cs.Close();
+          using (StreamWriter streamWriter = new((Stream)cryptoStream))
+          {
+            streamWriter.Write(plainText);
+          }
+
+          array = memoryStream.ToArray();
         }
-        clearText = Convert.ToBase64String(ms.ToArray());
       }
     }
-    return clearText;
+
+    return Convert.ToBase64String(array);
   }
-  public static string Decrypt(string cipherText, string EncryptionKey)
+
+  public static string Decrypt(string cipherText, byte[] encryptionKeyBytes)
   {
-    //string EncryptionKey = "abc123";
-    cipherText = cipherText.Replace(" ", "+");
-    byte[] cipherBytes = Convert.FromBase64String(cipherText);
-    using (Aes encryptor = Aes.Create())
+    byte[] iv = new byte[16];
+    byte[] buffer = Convert.FromBase64String(cipherText);
+
+    using (Aes aes = Aes.Create())
     {
-      Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-      encryptor.Key = pdb.GetBytes(32);
-      encryptor.IV = pdb.GetBytes(16);
-      using (MemoryStream ms = new MemoryStream())
+      aes.Key = encryptionKeyBytes;
+      aes.IV = iv;
+      ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+      using (MemoryStream memoryStream = new(buffer))
       {
-        using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+        using (CryptoStream cryptoStream = new((Stream)memoryStream, decryptor, CryptoStreamMode.Read))
         {
-          cs.Write(cipherBytes, 0, cipherBytes.Length);
-          cs.Close();
+          using (StreamReader streamReader = new((Stream)cryptoStream))
+          {
+            return streamReader.ReadToEnd();
+          }
         }
-        cipherText = Encoding.Unicode.GetString(ms.ToArray());
       }
     }
-    return cipherText;
+  }
+
+  private static readonly byte[] Salt = new byte[] { 10, 20, 30, 40, 50, 60, 70, 80 };
+  public static byte[] CreateKey(string password, int keyBytes = 32)
+  {
+    const int Iterations = 300;
+    var keyGenerator = new Rfc2898DeriveBytes(password, Salt, Iterations);
+    return keyGenerator.GetBytes(keyBytes);
   }
 }
-
-
-//https://github.com/2Toad/Rijndael256/issues/13#issuecomment-637724412
-//doesn't work with rjiendahl class
-

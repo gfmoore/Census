@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Census.DetailPage"
+
+             NavigationPage.HasNavigationBar="false">
+
+  <Grid RowDefinitions="*"
+    Margin="0,0,0,0"
+    RowSpacing="5">
+
+    <Frame Grid.Row="0"
+         CornerRadius="10"
+         BorderColor="Yellow"
+         BackgroundColor="Black"
+         Margin="10,10,10,10">
+
+      <Grid RowDefinitions="*,*,*, *"
+            Margin="10,10,10,10"
+            RowSpacing="10">
+        <Grid Grid.Row="0" 
+              ColumnDefinitions="*, *">
+          <Label Grid.Column="0" 
+                 Text="{Binding FName}"
+                 TextColor="Yellow" 
+                 FontSize="20"/>
+               
+          <Label Grid.Column="1" 
+                 Text="{Binding LName}" 
+                 TextColor="Yellow" 
+                 FontSize="20"/>
+        </Grid>
+        
+        <Entry Grid.Row="1" 
+               FontSize="20"
+               TextColor="Yellow"
+               Placeholder="Hello for text" 
+               PlaceholderColor="White" />
+        
+        <Button Grid.Row="2" 
+                Text="Hit me" 
+                TextColor="Yellow" 
+                BackgroundColor="Blue" 
+                FontSize="30" 
+                Command="{Binding ReturnMainPageCommand}"/>
+        </Grid>
+
+    </Frame>
+  </Grid>
+
+</ContentPage>
