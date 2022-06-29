@@ -231,6 +231,7 @@ public partial class CensusViewModel : ObservableObject
           await App.Database.SaveFriendAsync(f);
         }
 
+        stream.Close();
         Console.WriteLine("GM: JSON file data loaded");
 
       }
@@ -263,6 +264,7 @@ public partial class CensusViewModel : ObservableObject
           await App.Database.SaveFSGroupAsync(g);
         }
 
+        stream.Close();
         Console.WriteLine("GM: Group JSON file data loaded");
       }
 
@@ -375,6 +377,9 @@ public partial class CensusViewModel : ObservableObject
       f.Address = EncryptionHelper.Decrypt(f.Address, encryptionKeyBytes);
     }
     DismissKeyboard();
+
+    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
+
 
     Console.WriteLine("End Decrypt displayed data");
 

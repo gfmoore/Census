@@ -1,6 +1,4 @@
-﻿using Java.Security;
-
-namespace Census;
+﻿namespace Census;
 
 public partial class App : Application
 {

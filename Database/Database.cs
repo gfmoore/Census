@@ -1,7 +1,4 @@
-﻿using Census.Classes;
-using SQLite;
-
-namespace Census.Database;
+﻿namespace Census.Database;
 
 public class Database
 {
