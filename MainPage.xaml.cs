@@ -2,9 +2,9 @@
 
 public partial class MainPage : ContentPage
 {
-  public MainPage()
+  public MainPage(CensusViewModel viewModel)
   {
     InitializeComponent();
-    this.BindingContext = new CensusViewModel();
+    BindingContext = viewModel;
   }
 }

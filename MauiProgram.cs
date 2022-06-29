@@ -15,9 +15,9 @@ public static class MauiProgram
 
 		//dependency injection
 		builder.Services.AddTransient<MainPage>();
-		builder.Services.AddTransient<DetailPage>();
 		builder.Services.AddTransient<CensusViewModel>();
-		builder.Services.AddTransient<CensusDetailViewModel>();
+    builder.Services.AddTransient<DetailPage>();
+    builder.Services.AddTransient<CensusDetailViewModel>();
 
     //builder.Services.AddSingleton<IAlertService, AlertService>();
 
