@@ -6,9 +6,6 @@ public partial class CensusViewModel : ObservableObject
     LoadData();
     LoadPickerWithGroups();
     SetupTimer();
-
-    //Routing.RegisterRoute("main", typeof(MainPage));
-    Routing.RegisterRoute("details", typeof(DetailPage));
   }
 
   //selected item in the list of friends
@@ -110,8 +107,7 @@ public partial class CensusViewModel : ObservableObject
     {
         { "Friend", f }
     };
-    await Shell.Current.GoToAsync("details", navigationParameter);
-    //await Shell.Current.GoToAsync(nameof(Census.DetailPage), true, navigationParameter);
+    await Shell.Current.GoToAsync(nameof(DetailPage), true, navigationParameter);
 
     //remove selection highlight
     SelectedItem = null;
