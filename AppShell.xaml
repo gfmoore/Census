@@ -6,4 +6,8 @@
     xmlns:local="clr-namespace:Census"
     Shell.FlyoutBehavior="Disabled">
 
+  <ShellContent
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+
 </Shell>

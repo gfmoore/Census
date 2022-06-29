@@ -1,15 +1,15 @@
-﻿using Microsoft.Maui.ApplicationModel.Communication;
-
-namespace Census.ViewModels;
-
+﻿namespace Census.ViewModels;
 public partial class CensusViewModel : ObservableObject
 {
   public CensusViewModel()
   {
     LoadData();
+    LoadPickerWithGroups();
     SetupTimer();
-  }
 
+    //Routing.RegisterRoute("main", typeof(MainPage));
+    Routing.RegisterRoute("details", typeof(DetailPage));
+  }
 
   //selected item in the list of friends
   [ObservableProperty]
@@ -38,7 +38,7 @@ public partial class CensusViewModel : ObservableObject
 
   //Picker for groups
   [ObservableProperty]
-  List<string> fSGroups = new() { "All", "1", "2", "3", "4", "5", "6", "" };
+  ObservableCollection<FSGroup> fSGroups = new();
 
   [ObservableProperty]
   private int fSGroupsIndex = -1;
@@ -53,44 +53,121 @@ public partial class CensusViewModel : ObservableObject
   [ObservableProperty]
   private bool passphraseEntryEnabled = true; //connected the the passphrase entry control (view
 
-
-
-  partial void OnFSGroupsIndexChanged(int value)
-  {
-    FilterData(value);  //to use async await  //using the index
-    //FilterData(FSGroupsSelectedItem);       //using the string, doesn't work
-  }
+  //for activity indicator
+  [ObservableProperty]
+  private bool isBusy = false;
 
 
   public async void LoadData()
   {
+    IsBusy = true;
     List<Friend> l = await App.Database.GetFriendsAsync();
+    l = new List<Friend>(l.OrderBy(x => x.LName).ThenBy(x => x.FName));      //sort the data -should refactor really but ...
     FriendsOC = new ObservableCollection<Friend>(l);
-    //make a copy for filtering of unencrypted data
-    lf = l;
+    
+    lf = l;  //for filtering
+    IsBusy = false;
   }
 
-  //respond to item select in list of friends
-  public ICommand SelectionChangedCommand => new Command<Object>(async (Object e) =>
+  public async void LoadPickerWithGroups()
   {
-    Console.WriteLine($"Selection made {SelectedItem.FName} {SelectedItem.LName}");
+    FSGroup fsg = new()
+    {
+      GroupId = "0",
+      GroupLeader = "All Groups"
+    };
+    FSGroups.Add(fsg);
+      
+    //get list of groups
+    List<FSGroup> g = await App.Database.GetFSGroupsAsync();
+    foreach(FSGroup fg in g)
+    {
+      //FSGroups.Add($"{fg.GroupId} {fg.GroupLeader}");
+      FSGroups.Add(fg);
+    }
 
-    INavigation navigation = App.Current.MainPage.Navigation;
-    await navigation.PushModalAsync(new DetailPage(SelectedItem));
+    //add blank last entry
+    fsg = new FSGroup
+    {
+      GroupId = "99",
+      GroupLeader = "Not Assigned"
+    };
+    FSGroups.Add(fsg);
+  }
 
-  });
+
+  [RelayCommand] 
+  public async void SelectionChanged() //Friend friend
+  {
+    if (SelectedItem == null) return;
+
+    Friend f = SelectedItem;
+
+    Console.WriteLine($"Selection made {f.FName} {f.LName}");
+
+    //navigate
+    var navigationParameter = new Dictionary<string, object>
+    {
+        { "Friend", f }
+    };
+    await Shell.Current.GoToAsync("details", navigationParameter);
+    //await Shell.Current.GoToAsync(nameof(Census.DetailPage), true, navigationParameter);
+
+    //remove selection highlight
+    SelectedItem = null;
+  }
 
 
+  //sort and filter displayed data
+  [RelayCommand]
+  public void SortLName()
+  {
+    IsBusy = true;
+    Console.WriteLine("Sort LName");
+    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
+    IsBusy = false;
+  }
 
+  [RelayCommand]
+  public void SortFName()
+  {
+    IsBusy = true;
+    Console.WriteLine("Sort FName");
+    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
+    IsBusy = false;
+  }
+
+  //Filter the data by group
+  partial void OnFSGroupsIndexChanged(int value)
+  {
+    IsBusy = true;
+    FilterData(value);  //to use async await  //using the index
+    IsBusy = false;
+  }
+
+  private void FilterData(int value)  //if using the index from the pick
+  {
+    //get original data from lf
+    FriendsOC = new ObservableCollection<Friend>(lf);
+    if (FSGroups[value].GroupLeader == "All Groups") return;
+
+    if (FSGroups[value].GroupLeader == "Not Assigned")
+    {
+      FriendsOC = new ObservableCollection<Friend>(FriendsOC.Where(x => x.GroupId == ""));
+      return;
+    }
+    FriendsOC = new ObservableCollection<Friend>(FriendsOC.Where(x => x.GroupId == FSGroups[value].GroupId));
+  }
 
 
 
   //Reveal Actions - for decrypt encrypt import destroy buttons
-  public ICommand RevealCommand => new Command(() =>
+  [RelayCommand]
+  public void Reveal()
   {
     Console.WriteLine("Reveal");
     ToggleButtons();
-  });
+  }
   
   public void ToggleButtons()
   {
@@ -101,36 +178,11 @@ public partial class CensusViewModel : ObservableObject
     DecryptVisible = !DecryptVisible;
   }
 
-
-  //sort and filter displayed data
-  public ICommand SortLNameCommand => new Command(() =>
-  {
-    Console.WriteLine("Sort LName");
-    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
-  });
-
-  public ICommand SortFNameCommand => new Command(() =>
-  {
-    Console.WriteLine("Sort FName");
-    FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
-  });
-
-  private void FilterData(int value)  //if using the index from the pick
-  //private void FilterData(string value) //using the string from the pick - doesnt work
-  {
-    //get original data from lf
-    FriendsOC = new ObservableCollection<Friend>(lf);
-    //if (value != 0)  //0 = All
-    if (FSGroups[value] != "All")  
-    {
-      FriendsOC = new ObservableCollection<Friend>(FriendsOC.Where(x => x.GroupId == FSGroups[value]));
-    }
-  }
-
-
   //Import Friends and Groups from json files put in Downloads folder for device
-  public ICommand ImportDataCommand => new Command( async () =>
+  [RelayCommand]
+  public async void ImportData ()
   {
+    IsBusy = true;
     Console.WriteLine("Import data");
     //create custom filetypes
     var customFileType = new FilePickerFileType(
@@ -162,8 +214,9 @@ public partial class CensusViewModel : ObservableObject
     //refresh
     List<Friend> l = await App.Database.GetFriendsAsync();
     FriendsOC = new ObservableCollection<Friend>(l);
-    
-  });
+
+    IsBusy = false; 
+  }
 
   public static async Task<FileResult> GrabFriends(PickOptions options)
   {
@@ -237,7 +290,8 @@ public partial class CensusViewModel : ObservableObject
     timer.AutoReset = false;
   }
 
-  public ICommand DestroyCommand => new Command(async () =>
+  [RelayCommand]
+  public async void Destroy()
   {
     pushCount++;
     if (pushCount == 1)
@@ -259,7 +313,7 @@ public partial class CensusViewModel : ObservableObject
     FriendsOC = new ObservableCollection<Friend>(l);
 
     lf = null;
-  });
+  }
 
   private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
   {
@@ -272,32 +326,13 @@ public partial class CensusViewModel : ObservableObject
 
 
   //Encrypt/decrypt data
-  public ICommand EncryptCommand => new Command(() =>
+
+  [RelayCommand]
+  public async void Encrypt()
   {
+    IsBusy = true;
     Console.WriteLine("Start Encrypt displayed data ");
-    EncryptData();
-    Console.WriteLine("End Encrypt displayed data");
-  });
 
-  public ICommand DecryptCommand => new Command( () =>
-  {
-    Console.WriteLine("Start Decrypt displayed data ");
-    DecryptData();
-    Console.WriteLine("End Decrypt displayed data");
-
-    //make a copy in the list lf for use in filtering
-    lf = FriendsOC.ToList<Friend>();
-
-    //if decrypted hide the text entry? and decrypt button
-    PasswordVisible = false;
-    DecryptVisible = false;
-    ImportVisible = !ImportVisible;
-    DestroyVisible = !DestroyVisible;
-    EncryptVisible = !EncryptVisible;
-  });
-
-  public async void EncryptData()
-  {
     //get an encryption key from the password
     byte[] encryptionKeyBytes = EncryptionHelper.CreateKey(Passphrase);
     //do the displayed data first
@@ -319,10 +354,17 @@ public partial class CensusViewModel : ObservableObject
     }
 
     DismissKeyboard();
+
+    Console.WriteLine("End Encrypt displayed data");
+    IsBusy = false;
   }
 
-  public void DecryptData()
+  [RelayCommand]
+  public void Decrypt()
   {
+    IsBusy = true;
+    Console.WriteLine("Start Decrypt displayed data ");
+
     //get an encryption key from the password
     byte[] encryptionKeyBytes = EncryptionHelper.CreateKey(Passphrase);
 
@@ -337,6 +379,20 @@ public partial class CensusViewModel : ObservableObject
       f.Address = EncryptionHelper.Decrypt(f.Address, encryptionKeyBytes);
     }
     DismissKeyboard();
+
+    Console.WriteLine("End Decrypt displayed data");
+
+    //make a copy in the list lf for use in filtering
+    lf = FriendsOC.ToList<Friend>();
+
+    //if decrypted hide the text entry? and decrypt button
+    PasswordVisible = false;
+    DecryptVisible = false;
+    ImportVisible = !ImportVisible;
+    DestroyVisible = !DestroyVisible;
+    EncryptVisible = !EncryptVisible;
+
+    IsBusy = false;
   }
 
   public void DismissKeyboard()

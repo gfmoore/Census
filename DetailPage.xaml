@@ -110,10 +110,10 @@
                  Padding="0,10,0,0"
                  TextColor="LightBlue" />
 
-          <Entry Grid.Column="1" 
-                    Text="{Binding Friend.Address}"
-                    TextColor="Yellow" 
-                    FontSize="20"/>
+          <Editor Grid.Column="1" 
+                  Text="{Binding Friend.Address}"
+                  TextColor="Yellow" 
+                  FontSize="20"/>
         </Grid>
 
         <Grid ColumnDefinitions="*,*, *, *"
@@ -150,14 +150,14 @@
                       Command="{Binding DeleteReturnMainPageCommand}"/>
 
           <Button Grid.Column="3" 
-                      Text="Cancel" 
-                      TextColor="White" 
-                      BackgroundColor="Blue" 
-                      FontSize="20" 
-                      WidthRequest="80"
-                      HeightRequest="40"
-                      Padding="0,0,0,0"
-                      Command="{Binding CancelReturnMainPageCommand}"/>
+                  Text="Cancel" 
+                  TextColor="White" 
+                  BackgroundColor="Blue" 
+                  FontSize="20" 
+                  WidthRequest="80"
+                  HeightRequest="40"
+                  Padding="0,0,0,0"
+                  Command="{Binding CancelReturnMainPageCommand}"/>
         </Grid>
       </StackLayout>
     </ScrollView>

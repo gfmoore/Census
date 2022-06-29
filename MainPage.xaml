@@ -6,7 +6,7 @@
              NavigationPage.HasNavigationBar="false">
 
   <Grid
-    RowDefinitions="30, *, 65, 10"
+    RowDefinitions="30, *, 65"
     Margin="0,0,0,0"
     RowSpacing="5">
 
@@ -44,6 +44,8 @@
                 HorizontalOptions="Start"
                 FontSize="15"
                 ItemsSource="{Binding FSGroups}"
+                ItemDisplayBinding="{Binding GroupLeader}"
+
                 SelectedIndex="{Binding FSGroupsIndex}" 
                 SelectedItem="{Binding FSGroupsSelectedItem}" />
       </Grid>
@@ -151,6 +153,12 @@
       </Grid>
     </Frame>
 
+    <ActivityIndicator Grid.RowSpan="3"
+                       Color="Orange"
+                       IsRunning="{Binding IsBusy}"
+                       HorizontalOptions="FillAndExpand"
+                       VerticalOptions="CenterAndExpand"
+                       />
   </Grid>
 </ContentPage>
 

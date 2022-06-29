@@ -1,4 +1,6 @@
-﻿namespace Census;
+﻿using Java.Security;
+
+namespace Census;
 
 public partial class App : Application
 {
@@ -17,11 +19,11 @@ public partial class App : Application
     }
   }
 
-  public App(MainPage mainPage)
+  public App()
   {
     InitializeComponent();
     Application.Current.UserAppTheme = AppTheme.Dark;
 
-    MainPage = new NavigationPage(mainPage);
+    MainPage = new AppShell();
   }
 }

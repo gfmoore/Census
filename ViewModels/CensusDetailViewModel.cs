@@ -1,45 +1,60 @@
 ﻿namespace Census.ViewModels;
 
+[QueryProperty(nameof(Friend), "Friend")]
+
 public partial class CensusDetailViewModel : ObservableObject
 {
 
   [ObservableProperty]
-  private Friend friend;  //passed through this constructor from the CollectionView.SelectedItem
+  private Friend friend;
 
-  public CensusDetailViewModel(Friend friend)
+  [ObservableProperty]
+  private bool entryEnabled = true;
+
+  public CensusDetailViewModel()
   {
-    Friend = friend;  //is this constructor and assignment necessary to link to the ObservableProperty?
+
   }
 
-  public ICommand UpdateReturnMainPageCommand => new Command<Object>(async (Object e) =>
+  [RelayCommand]
+  public async void UpdateReturnMainPage()
   {
+    //I'll need to encrypt back to the database!!!
     await App.Database.UpdateFriendAsync(Friend);
+    Console.WriteLine($"Friend {Friend.FName} {Friend.LName} updated!");
+    await Shell.Current.GoToAsync("..");
+  }
 
-    INavigation navigation = App.Current.MainPage.Navigation;
-    await navigation.PopModalAsync();
-  });
-
-  public ICommand AddReturnMainPageCommand => new Command<Object>(async (Object e) =>
+  [RelayCommand]
+  public async void AddReturnMainPage()
   {
     Friend.Id = 0;  //will this be enough to add a new friend?
     await App.Database.SaveFriendAsync(Friend);
+    Console.WriteLine($"New friend {Friend.FName} {Friend.LName} added!");
+    await Shell.Current.GoToAsync("..");
+  }
 
-    INavigation navigation = App.Current.MainPage.Navigation;
-    await navigation.PopModalAsync();
-  });
-
-  public ICommand DeleteReturnMainPageCommand => new Command<Object>(async (Object e) =>
+  [RelayCommand]
+  public async void DeleteReturnMainPage()
   {
+    bool response = await Application.Current.MainPage.DisplayAlert("Delete?", "Do you want to delete this Friend?", "Yes", "No/Cancel");
+    if (!response) return;
+
     await App.Database.DeleteFriendAsync(Friend);
+    Console.WriteLine($"Friend {Friend.FName} {Friend.LName} deleted!");
+    Friend = null;
+    await Shell.Current.GoToAsync("..");
+  }
 
-    INavigation navigation = App.Current.MainPage.Navigation;
-    await navigation.PopModalAsync();
-  });
-
-  public ICommand CancelReturnMainPageCommand => new Command<Object>(async (Object e) =>
+  [RelayCommand]
+  public async void CancelReturnMainPage()
   {
-    INavigation navigation = App.Current.MainPage.Navigation;
-    await navigation.PopModalAsync();
-  });
+    await Shell.Current.GoToAsync("..");
+  }
 
+  public void DismissKeyboard()
+  {
+    EntryEnabled = false;
+    EntryEnabled = true;
+  }
 }

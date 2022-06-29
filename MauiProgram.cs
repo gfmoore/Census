@@ -19,6 +19,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<CensusViewModel>();
 		builder.Services.AddTransient<CensusDetailViewModel>();
 
-		return builder.Build();
+    //builder.Services.AddSingleton<IAlertService, AlertService>();
+
+    return builder.Build();
 	}
 }

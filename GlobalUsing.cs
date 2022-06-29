@@ -1,4 +1,6 @@
 ﻿global using SQLite;
+global using CommunityToolkit.Mvvm;
+global using CommunityToolkit.Mvvm.Input;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using Census.Classes;
 global using Census.Database;
