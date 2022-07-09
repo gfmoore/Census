@@ -21,7 +21,11 @@ public partial class CensusDetailViewModel : ObservableObject
   {
     //I'll need to encrypt back to the database!!!
     await App.Database.UpdateFriendAsync(Friend);
-    Console.WriteLine($"Friend {Friend.FName} {Friend.LName} updated!");
+    Debug.WriteLine($"Friend {Friend.FName} {Friend.LName} updated!");
+
+    //send a message to mainpage to resort data
+    MessagingCenter.Send(new MessagingMarker(), "FriendUpdated");
+
     await Shell.Current.GoToAsync("..");
   }
 
@@ -30,7 +34,11 @@ public partial class CensusDetailViewModel : ObservableObject
   {
     Friend.Id = 0;  //will this be enough to add a new friend?
     await App.Database.SaveFriendAsync(Friend);
-    Console.WriteLine($"New friend {Friend.FName} {Friend.LName} added!");
+    Debug.WriteLine($"New friend {Friend.FName} {Friend.LName} added!");
+
+    //send a message to mainpage to resort data
+    MessagingCenter.Send(new MessagingMarker(), "FriendUpdated");
+
     await Shell.Current.GoToAsync("..");
   }
 
@@ -41,14 +49,20 @@ public partial class CensusDetailViewModel : ObservableObject
     if (!response) return;
 
     await App.Database.DeleteFriendAsync(Friend);
-    Console.WriteLine($"Friend {Friend.FName} {Friend.LName} deleted!");
+    Debug.WriteLine($"Friend {Friend.FName} {Friend.LName} deleted!");
     Friend = null;
+
+    //send a message to mainpage to resort data
+    MessagingCenter.Send(new MessagingMarker(), "FriendUpdated");
+
     await Shell.Current.GoToAsync("..");
   }
 
   [RelayCommand]
-  public async void CancelReturnMainPage()
+  public async static void CancelReturnMainPage()
   {
+    //dont need a message
+
     await Shell.Current.GoToAsync("..");
   }
 

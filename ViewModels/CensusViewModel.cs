@@ -6,6 +6,11 @@ public partial class CensusViewModel : ObservableObject
     LoadData();
     LoadPickerWithGroups();
     SetupTimer();
+
+    //get any messages
+    MessagingCenter.Subscribe<MessagingMarker>(this, "FriendUpdated", (s) => {
+      LoadData();
+    });
   }
 
   //selected item in the list of friends
@@ -100,7 +105,7 @@ public partial class CensusViewModel : ObservableObject
 
     Friend f = SelectedItem;
 
-    Console.WriteLine($"Selection made {f.FName} {f.LName}");
+    Debug.WriteLine($"Selection made {f.FName} {f.LName}");
 
     //navigate
     var navigationParameter = new Dictionary<string, object>
@@ -119,7 +124,7 @@ public partial class CensusViewModel : ObservableObject
   public void SortLName()
   {
     IsBusy = true;
-    Console.WriteLine("Sort LName");
+    Debug.WriteLine("Sort LName");
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
     IsBusy = false;
   }
@@ -128,7 +133,7 @@ public partial class CensusViewModel : ObservableObject
   public void SortFName()
   {
     IsBusy = true;
-    Console.WriteLine("Sort FName");
+    Debug.WriteLine("Sort FName");
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.FName));
     IsBusy = false;
   }
@@ -161,7 +166,7 @@ public partial class CensusViewModel : ObservableObject
   [RelayCommand]
   public void Reveal()
   {
-    Console.WriteLine("Reveal");
+    Debug.WriteLine("Reveal");
     ToggleButtons();
   }
   
@@ -179,7 +184,7 @@ public partial class CensusViewModel : ObservableObject
   public async void ImportData ()
   {
     IsBusy = true;
-    Console.WriteLine("Import data");
+    Debug.WriteLine("Import data");
     //create custom filetypes
     var customFileType = new FilePickerFileType(
       new Dictionary<DevicePlatform, IEnumerable<string>>
@@ -194,18 +199,18 @@ public partial class CensusViewModel : ObservableObject
     };
 
     //get filepicker for friends.json
-    Console.WriteLine($"Import friends");
+    Debug.WriteLine($"Import friends");
     options.PickerTitle = "Please select friends.json file";
 
     await GrabFriends(options);
-    Console.WriteLine("Friends imported.");
+    Debug.WriteLine("Friends imported.");
 
 
-    Console.WriteLine($"Import groups");
+    Debug.WriteLine($"Import groups");
     options.PickerTitle = "Please select groups.json file";
 
     await GrabGroups(options);
-    Console.WriteLine("Groups imported");
+    Debug.WriteLine("Groups imported");
 
     //refresh
     List<Friend> l = await App.Database.GetFriendsAsync();
@@ -232,7 +237,7 @@ public partial class CensusViewModel : ObservableObject
         }
 
         stream.Close();
-        Console.WriteLine("GM: JSON file data loaded");
+        Debug.WriteLine("GM: JSON file data loaded");
 
       }
 
@@ -240,7 +245,7 @@ public partial class CensusViewModel : ObservableObject
     }
     catch (Exception ex)
     {
-      Console.WriteLine("GM: Ooops in Json : " + ex.Message);
+      Debug.WriteLine("GM: Ooops in Json : " + ex.Message);
     }
 
     return null;
@@ -265,14 +270,14 @@ public partial class CensusViewModel : ObservableObject
         }
 
         stream.Close();
-        Console.WriteLine("GM: Group JSON file data loaded");
+        Debug.WriteLine("GM: Group JSON file data loaded");
       }
 
       return result;
     }
     catch (Exception ex)
     {
-      Console.WriteLine("GM: Ooops in Json : " + ex.Message);
+      Debug.WriteLine("GM: Ooops in Json : " + ex.Message);
     }
 
     return null;
@@ -294,15 +299,15 @@ public partial class CensusViewModel : ObservableObject
     pushCount++;
     if (pushCount == 1)
     {
-      Console.WriteLine("Timer started");
+      Debug.WriteLine("Timer started");
       timer.Start();
     }
     if (pushCount == 3)
     {
-      Console.WriteLine($"DESTROY...");
+      Debug.WriteLine($"DESTROY...");
       await App.Database.DeleteAllFriendsAsync();
       await App.Database.DeleteAllGroupsAsync();
-      Console.WriteLine($"DESTROYED!!");
+      Debug.WriteLine($"DESTROYED!!");
 
       pushCount = 0;
     }
@@ -316,7 +321,7 @@ public partial class CensusViewModel : ObservableObject
   private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
   {
     // Code to be executed at the end of Timer 
-    Console.WriteLine("Timer ending 3 second count");
+    Debug.WriteLine("Timer ending 3 second count");
     timer.Stop();
     timer.Close();
     pushCount = 0;
@@ -329,7 +334,7 @@ public partial class CensusViewModel : ObservableObject
   public async void Encrypt()
   {
     IsBusy = true;
-    Console.WriteLine("Start Encrypt displayed data ");
+    Debug.WriteLine("Start Encrypt displayed data ");
 
     //get an encryption key from the password
     byte[] encryptionKeyBytes = EncryptionHelper.CreateKey(Passphrase);
@@ -353,7 +358,7 @@ public partial class CensusViewModel : ObservableObject
 
     DismissKeyboard();
 
-    Console.WriteLine("End Encrypt displayed data");
+    Debug.WriteLine("End Encrypt displayed data");
     IsBusy = false;
   }
 
@@ -361,7 +366,7 @@ public partial class CensusViewModel : ObservableObject
   public void Decrypt()
   {
     IsBusy = true;
-    Console.WriteLine("Start Decrypt displayed data ");
+    Debug.WriteLine("Start Decrypt displayed data ");
 
     //get an encryption key from the password
     byte[] encryptionKeyBytes = EncryptionHelper.CreateKey(Passphrase);
@@ -381,7 +386,7 @@ public partial class CensusViewModel : ObservableObject
     FriendsOC = new ObservableCollection<Friend>(FriendsOC.OrderBy(x => x.LName).ThenBy(x => x.FName));
 
 
-    Console.WriteLine("End Decrypt displayed data");
+    Debug.WriteLine("End Decrypt displayed data");
 
     //make a copy in the list lf for use in filtering
     lf = FriendsOC.ToList<Friend>();
